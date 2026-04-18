@@ -70,13 +70,17 @@ if len(df):
 st.header("📋 案件一覧")
 col_f1, col_f2, col_f3 = st.columns(3)
 with col_f1:
-    f_member = st.multiselect("担当者", options=MEMBERS, default=MEMBERS)
+    f_member_option = st.selectbox("担当者", ["全て"] + MEMBERS)
 with col_f2:
-    f_status = st.multiselect("ステータス", options=STATUS_OPTIONS, default=STATUS_OPTIONS)
+    f_status_option = st.selectbox("ステータス", ["全て"] + STATUS_OPTIONS)
 with col_f3:
     f_company = st.text_input("会社名で検索")
 
-filtered = df[df["担当者"].isin(f_member) & df["ステータス"].isin(f_status)]
+filtered = df.copy()
+if f_member_option != "全て":
+    filtered = filtered[filtered["担当者"] == f_member_option]
+if f_status_option != "全て":
+    filtered = filtered[filtered["ステータス"] == f_status_option]
 if f_company:
     filtered = filtered[filtered["会社名"].str.contains(f_company, na=False)]
 
@@ -126,7 +130,7 @@ with st.form("update_form"):
         st.success(f"{len(target)}件を「{new_status}」に更新しました")
         st.rerun()
 
-# === 新規案件追加（全ユーザー共通） ===
+# === 新規案件追加 ===
 st.header("➕ 新規案件追加")
 with st.form("new_deal"):
     new_company = st.text_input("会社名")
